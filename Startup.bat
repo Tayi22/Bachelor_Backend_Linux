@@ -1,3 +1,9 @@
+IF NOT EXIST /data (
+	md data
+	cd data
+	md db
+	cd ..
+)
 cd batchFiles
 start database.bat
 timeout /t 5
