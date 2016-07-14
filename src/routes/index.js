@@ -17,7 +17,7 @@ router.route('/pattern')
         //TODO Implement get all Patterns
     })
     .post((req, res) => {
-        //TODO IMplement save a Pattern
+        //TODO Implement save a Pattern
     });
 
 
@@ -38,4 +38,16 @@ router.route('/:tactic_id')
         //TODO Implement change single Tactic by id
     })
 
-router.get('/mappingsByPattern/:id')
+router.get('/mappingsByPatternId/:id',(req,res)=>{
+   //TODO List of all mapped Tactics to given Pattern by ID
+});
+
+router.get('/mappingsByTacticId/:id',(req,res)=>{
+   //TODO List of all mapped Patterns to given Tactic by ID
+});
+
+router.get('/relatedPatternFromId(:id',(req,res)=>{
+    //TODO Get all related Patterns from given Pattern by ID
+});
+
+export default router
