@@ -36,26 +36,56 @@ router.route('/tactic')
     });
 
 router.route('/pattern')
+
     .get((req, res) => {
-        //TODO Implement get all Patterns
+
+        Pattern.find((err, queryResult) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(queryResult);
+        });
+
     })
+
     .post((req, res) => {
-        //TODO Implement save a Pattern
+        let savePattern = new Pattern();
+        savePattern.name = req.body.name;
+        savePattern.info = req.body.info;
+        savePattern.mappingIds = req.body.mappingIds;
+        savePattern.relatedPatternIds = req.body.relatedPatternIds;
+        saveTactic.save((err, savedObject) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(savedObject);
+        });
     });
 
 
 router.route('/:pattern_id')
     .get((req,res)=>{
-        //TODO Implement get single Pattern by id
+        Pattern.findById(req.params._id, (err, queryResult) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(queryResult);
+        });
     })
+
     .put((req,res)=>{
         //TODO Implement change single Pattern by id
-    })
+    });
 
 
 router.route('/:tactic_id')
     .get((req,res)=>{
-        //TODO Implement get single Tactic by id
+        Tactic.findById(req.params._id, (err, queryResult) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(queryResult);
+        });
     })
     .put((req,res)=>{
         //TODO Implement change single Tactic by id
