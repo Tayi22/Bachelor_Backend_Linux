@@ -1,12 +1,22 @@
 //All Paths have the rootpath "/api".
-import tacticModel from '../model/tactics';
-import express from 'express';
+import tacticModel from '../model/tactics'
+import Pattern from '../model/pattern'
+import express from 'express'
+import mongoose from 'mongoose'
 
 let router = express.Router();
 
+//database connection
+mongoose.connect('mongodb://localhost:27017');
+
 router.route('/tactic')
     .get((req, res) => {
-        //TODO Implement get all Tactics
+        Pattern.find((err, queryResult) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(queryResult);
+        });
     })
     .post((req, res) => {
         //TODO Implement save a Tactic
