@@ -38,3 +38,4 @@ router.route('/:tactic_id')
         //TODO Implement change single Tactic by id
     })
 
+router.get('/mappingsByPattern/:id')
