@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import index from './routes/index';
 
-let expressVar = express
+let expressVar = express();
 
 expressVar.set('views', path.join(__dirname,'views'));
 expressVar.set('view engine','jade');
@@ -20,5 +20,5 @@ expressVar.use(express.static('../public'));
 
 expressVar.use('/api', index); //Switch the name of the path if needed
 
-module.exports = expressVar
+export default expressVar
 
