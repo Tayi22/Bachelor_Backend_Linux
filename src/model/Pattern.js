@@ -6,7 +6,9 @@ import mongoose from 'mongoose'
 
 const patternSchema = new mongoose.Schema({
     name: String,
-    info: String
+    info: String,
+    mappingIds: Array,
+    relatedPatternIds: Array
 });
 
 export default mongoose.model('Pattern', patternSchema);
