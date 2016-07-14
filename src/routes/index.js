@@ -1,5 +1,5 @@
 //All Paths have the rootpath "/api".
-import Tactic from '../model/tactics'
+import Tactic from '../model/tactic'
 import Pattern from '../model/pattern'
 import express from 'express'
 import mongoose from 'mongoose'
@@ -54,7 +54,7 @@ router.route('/pattern')
         savePattern.info = req.body.info;
         savePattern.mappingIds = req.body.mappingIds;
         savePattern.relatedPatternIds = req.body.relatedPatternIds;
-        saveTactic.save((err, savedObject) => {
+        savePattern.save((err, savedObject) => {
             if (err)
                 res.send(err);
             else
@@ -63,7 +63,7 @@ router.route('/pattern')
     });
 
 
-router.route('/:pattern_id')
+router.route('/pattern/:pattern_id')
     .get((req,res)=>{
         Pattern.findById(req.params._id, (err, queryResult) => {
             if (err)
@@ -74,11 +74,11 @@ router.route('/:pattern_id')
     })
 
     .put((req,res)=>{
-        //TODO Implement change single Pattern by id
+
     });
 
 
-router.route('/:tactic_id')
+router.route('/tactic/:tactic_id')
     .get((req,res)=>{
         Tactic.findById(req.params._id, (err, queryResult) => {
             if (err)
@@ -104,11 +104,42 @@ router.get('/relatedPatternFromId/:id',(req,res)=>{
 });
 
 
-router.post('/mapping',(req,res)=>{
+router.post('/mapping',checkExistingPattern, checkExistingTactic, (req,res)=>{
     let saveMapping = new Mapping();
-    //TODO Check if Patterns with ID exist.
-    saveMapping.patternId = req.body.patternId;
-    saveMapping.tacticId = req.body.tacticId;
+    let patternId = req.body.patternId;
+    let tacticId = req.body.tacticId;
+    saveMapping.patternId = patternId;
+    saveMapping.tacticId = tacticId;
+
+
 });
+
+function checkExistingTactic (req,res,next){
+    let tacticId = req.body.tacticId;
+    Tactic.count({_id: tacticId}, (err,count)=>{
+        if(err){
+            res.send(err);
+        }else
+        if(count <= 0){
+            res.json({error:"Error, Tactic not found"});
+        }else {
+            next();
+        }
+    });
+}
+
+function checkExistingPattern (req,res,next) {
+    let patternId = req.body.patternId;
+    Pattern.count({_id: patternId}, (err,count)=>{
+        if(err){
+            res.send(err);
+        }else
+        if(count <= 0){
+            res.json({error:"Error, Pattern not found"});
+        }else {
+            next();
+        }
+    });
+}
 
 export default router
