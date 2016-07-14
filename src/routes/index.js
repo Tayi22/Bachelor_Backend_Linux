@@ -1,5 +1,5 @@
 //All Paths have the rootpath "/api".
-import tacticModel from '../model/tactics'
+import Tactic from '../model/tactics'
 import Pattern from '../model/pattern'
 import express from 'express'
 import mongoose from 'mongoose'
@@ -11,7 +11,7 @@ mongoose.connect('mongodb://localhost:27017');
 
 router.route('/tactic')
     .get((req, res) => {
-        Pattern.find((err, queryResult) => {
+        Tactic.find((err, queryResult) => {
             if (err)
                 res.send(err);
             else
@@ -20,6 +20,15 @@ router.route('/tactic')
     })
     .post((req, res) => {
         //TODO Implement save a Tactic
+
+        let saveTactic = new Tactic();
+
+
+
+
+
+
+
     });
 
 router.route('/pattern')
