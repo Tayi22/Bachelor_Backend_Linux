@@ -10,6 +10,7 @@ let router = express.Router();
 mongoose.connect('mongodb://localhost:27017');
 
 router.route('/tactic')
+    
     .get((req, res) => {
         Tactic.find((err, queryResult) => {
             if (err)
@@ -18,17 +19,19 @@ router.route('/tactic')
                 res.json(queryResult);
         });
     })
+    
     .post((req, res) => {
-        //TODO Implement save a Tactic
-
         let saveTactic = new Tactic();
-
-
-
-
-
-
-
+        saveTactic.name = req.body.name;
+        saveTactic.info = req.body.info;
+        saveTactic.mappingIds = req.body.mappingIds;
+        saveTactic.childTacticIds = req.body.childTacticIds;
+        saveTactic.save((err, savedObject) => {
+            if (err) 
+                res.send(err);
+            else 
+                res.json(savedObject);
+        });
     });
 
 router.route('/pattern')
