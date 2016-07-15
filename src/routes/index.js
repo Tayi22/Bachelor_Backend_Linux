@@ -64,8 +64,9 @@ router.route('/pattern')
 
 
 router.route('/pattern/:pattern_id')
+    
     .get((req,res)=>{
-        Pattern.findById(req.params._id, (err, queryResult) => {
+        Pattern.findById(req.params.pattern_id, (err, queryResult) => {
             if (err)
                 res.send(err);
             else
@@ -75,21 +76,36 @@ router.route('/pattern/:pattern_id')
 
     .put((req,res)=>{
 
+        Pattern.findByIdAndUpdate(req.params.pattern_id, req.body, (err, updateObject) => {
+
+            if (err)
+                res.send(err);
+            else
+                res.json(updateObject);
+
+        });
     });
 
-
 router.route('/tactic/:tactic_id')
+    
     .get((req,res)=>{
-        Tactic.findById(req.params._id, (err, queryResult) => {
+        Tactic.findById(req.params.tactic_id, (err, queryResult) => {
             if (err)
                 res.send(err);
             else
                 res.json(queryResult);
         });
     })
+
     .put((req,res)=>{
-        //TODO Implement change single Tactic by id
-    })
+        Tactic.findByIdAndUpdate(req.params.tactic_id, req.body, (err, queryResult) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(queryResult);
+        })
+
+    });
 
 router.get('/mappingsByPatternId/:id',(req,res)=>{
    //TODO List of all mapped Tactics to given Pattern by ID
