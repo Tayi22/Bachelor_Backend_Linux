@@ -126,6 +126,7 @@ router.post('/mapping',checkExistingPattern, checkExistingTactic, (req,res)=>{
     let tacticId = req.body.tacticId;
     saveMapping.patternId = patternId;
     saveMapping.tacticId = tacticId;
+    //TODO Update Pattern und Tactic Info and save Mapping
 
 
 });
@@ -134,6 +135,7 @@ function checkExistingTactic (req,res,next){
     let tacticId = req.body.tacticId;
     Tactic.count({_id: tacticId}, (err,count)=>{
         if(err){
+            res.statusCode()
             res.send(err);
         }else
         if(count <= 0){
