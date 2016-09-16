@@ -1,7 +1,9 @@
 /**
  * Created by Richard on 14.07.2016.
  */
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
+
+const mongoose = require('mongoose');
 
 const tacticsSchema = new mongoose.Schema({
     name: {type: String, index:{unique: true}},
@@ -11,4 +13,4 @@ const tacticsSchema = new mongoose.Schema({
     childTacticIds: Array
 });
 
-export default mongoose.model('Tactic', tacticsSchema);
+module.exports = mongoose.model('Tactic', tacticsSchema);

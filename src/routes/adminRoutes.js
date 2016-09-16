@@ -1,14 +1,25 @@
-import Tactic from '../model/tactic'
-import Pattern from '../model/pattern'
-import express from 'express'
-import mongoose from 'mongoose';
-import Mapping from '../model/mapping';
-import 'babel-polyfill';
-import async from 'async';
-import Bluebird from 'bluebird';
-import JSONConverter from '../middleware/JSONConverter';
-import helper from '../middleware/helper';
-import User from '../model/user';
+// import 'babel-polyfill';
+// import Tactic from '../model/tactic'
+// import Pattern from '../model/pattern'
+// import express from 'express'
+// import mongoose from 'mongoose';
+// import Mapping from '../model/mapping';
+// import async from 'async';
+// import Bluebird from 'bluebird';
+// import JSONConverter from '../middleware/JSONConverter';
+// import helper from '../middleware/helper';
+// import User from '../model/user';
+
+const Tactic = require('../model/tactic');
+const Pattern = require('../model/pattern');
+const express = require('express');
+const mongoose = require('mongoose');
+const Mapping = require('../model/mapping');
+const async = require('async');
+const Bluebird = require('bluebird');
+const JSONConverter = require('../middleware/JSONConverter');
+const helper = require('../middleware/helper');
+const User = require('../model/user');
 
 let router = express.Router();
 
@@ -185,4 +196,4 @@ function deleteMapping(id){
 	});
 }
 
-export default router
+module.exports = router;

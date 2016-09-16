@@ -1,5 +1,8 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt-nodejs';
+// import mongoose from 'mongoose';
+// import bcrypt from 'bcrypt-nodejs';
+
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
 
 //Required Salt factor for the hashes.
 const SALT_WORK_FACTOR = 10;
@@ -42,4 +45,4 @@ userSchema.methods.validatePassword = function(candidate,cb){
 	})
 }
 
-export default mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);

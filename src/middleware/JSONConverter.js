@@ -34,4 +34,4 @@ const JSONConverter = {
 	}
 }
 
-export default JSONConverter
+module.exports = JSONConverter;

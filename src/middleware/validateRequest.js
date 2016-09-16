@@ -1,8 +1,14 @@
-import jwt from 'jwt-simple';
-import secret from '../config/secret';
-import User from '../model/user';
-import Bluebird from 'bluebird';
-import mongoose from 'mongoose';
+// import jwt from 'jwt-simple';
+// import secret from '../config/secret';
+// import User from '../model/user';
+// import Bluebird from 'bluebird';
+// import mongoose from 'mongoose';
+
+const jwt = require('jwt-simple');
+const secret = require('../config/secret');
+const User = require('../model/user');
+const Bluebird = require('bluebird');
+const mongoose = require('mongoose');
 
 function validateUser(username,token){
 
@@ -16,7 +22,7 @@ function validateUser(username,token){
 }
 
 
-export default function(req,res,next){
+module.exports = function(req,res,next){
 	//Check weather the token is in body, query or in the header and set the variable "token".
 	let token = (req.body && req.body.access_token) || (req.query && req.query.access_token) || (req.headers['x-access-token']);
 

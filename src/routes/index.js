@@ -1,12 +1,21 @@
 //All Paths have the rootpath "/api".
-import Tactic from '../model/tactic'
-import Pattern from '../model/pattern'
-import express from 'express'
-import mongoose from 'mongoose'
-import Mapping from '../model/mapping';
-import 'babel-polyfill';
-import async from 'async';
-import Bluebird from 'bluebird';
+
+// import Tactic from '../model/tactic'
+// import Pattern from '../model/pattern'
+// import express from 'express'
+// import mongoose from 'mongoose'
+// import Mapping from '../model/mapping';
+// import 'babel-polyfill';
+// import async from 'async';
+// import Bluebird from 'bluebird';
+
+const Tactic = require('../model/tactic');
+const Pattern = require('../model/pattern');
+const express = require('express');
+const mongoose = require('mongoose');
+const Mapping = require('../model/mapping');
+const async = require('async');
+const Bluebird = require('bluebird');
 
 
 let router = express.Router();
@@ -489,5 +498,4 @@ function findMappingByIdQuery(id){
 	return Mapping.findById(id);
 }
 
-
-export default router
+module.exports = router;

@@ -1,4 +1,7 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
+
+const mongoose = require('mongoose');
+
 
 const commentMapping = new mongoose.Schema({
 	username: {type: String, required: true},
@@ -7,4 +10,4 @@ const commentMapping = new mongoose.Schema({
 	date: Date
 })
 
-export default mongoose.model('Comment',commentMapping);
+module.exports = mongoose.model('Comment',commentMapping);

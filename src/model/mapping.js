@@ -1,7 +1,9 @@
 /**
  * Created by Richard on 14.07.2016.
  */
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
+
+const mongoose = require('mongoose');
 
 const mappingSchema = new mongoose.Schema({
     patternId: {type: String, required: true},
@@ -21,6 +23,4 @@ mappingSchema.methods.getRating = () =>{
 	return this.rating / this.ratingNumb;
 }
 
-
-
-export default mongoose.model('Mapping', mappingSchema);
+module.exports = mongoose.model('Mapping', mappingSchema);

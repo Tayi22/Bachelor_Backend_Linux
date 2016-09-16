@@ -1,16 +1,30 @@
-import express from 'express';
-import path from 'path';
-import favicon from 'serve-favicon';
-import logger from 'morgan';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import index from './routes/index';
-import anonym from './routes/anonymosRoutes';
-import registred from './routes/registeredRoutes';
-import mongoose from 'mongoose';
-import validator from './middleware/validateRequest';
-import admin from './routes/adminRoutes';
-import JSONConverter from './middleware/JSONConverter';
+// import express from 'express';
+// import path from 'path';
+// import favicon from 'serve-favicon';
+// import logger from 'morgan';
+// import cookieParser from 'cookie-parser';
+// import bodyParser from 'body-parser';
+// import index from './routes/index';
+// import anonym from './routes/anonymosRoutes';
+// import registred from './routes/registeredRoutes';
+// import mongoose from 'mongoose';
+// import validator from './middleware/validateRequest';
+// import admin from './routes/adminRoutes';
+// import JSONConverter from './middleware/JSONConverter';
+
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const index = require('./routes/index');
+const anonym = require('./routes/anonymosRoutes');
+const registred = require('./routes/registeredRoutes');
+const mongoose = require('mongoose');
+const validator = require('./middleware/validateRequest');
+const admin = require('./routes/adminRoutes');
+const JSONConverter = require('./middleware/JSONConverter');
 
 let expressVar = express();
 //database connection
@@ -67,5 +81,4 @@ expressVar.use(function(err, req, res, next){
 	else res.json(JSONConverter.convertJSONError("Ressource not found",404));
 })
 
-export default expressVar
-
+module.exports = expressVar;

@@ -1,13 +1,23 @@
-import Tactic from '../model/tactic'
-import Pattern from '../model/pattern'
-import express from 'express'
-import mongoose from 'mongoose';
-import Mapping from '../model/mapping';
-import 'babel-polyfill';
-import async from 'async';
-import Bluebird from 'bluebird';
-import JSONConverter from '../middleware/JSONConverter';
-import helper from '../middleware/helper';
+// import 'babel-polyfill';
+// import Tactic from '../model/tactic'
+// import Pattern from '../model/pattern'
+// import express from 'express'
+// import mongoose from 'mongoose';
+// import Mapping from '../model/mapping';
+// import async from 'async';
+// import Bluebird from 'bluebird';
+// import JSONConverter from '../middleware/JSONConverter';
+// import helper from '../middleware/helper';
+
+const Tactic = require('../model/tactic');
+const Pattern = require('../model/pattern');
+const express = require('express');
+const mongoose = require('mongoose');
+const Mapping = require('../model/mapping');
+const async = require('async');
+const Bluebird = require('bluebird');
+const JSONConverter = require('../middleware/JSONConverter');
+const helper = require('../middleware/helper');
 
 let router = express.Router();
 
@@ -178,8 +188,4 @@ router.post('/mappings/ratings',(req,res)=>{
 	});
 })
 
-
-
-
-
-export default router
+module.exports = router;

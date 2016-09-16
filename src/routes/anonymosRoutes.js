@@ -1,14 +1,25 @@
-import jwt from 'jwt-simple';
-import Tactic from '../model/tactic'
-import Pattern from '../model/pattern'
-import express from 'express'
-import mongoose from 'mongoose';
-import Mapping from '../model/mapping';
-import 'babel-polyfill';
-import JSONConverter from '../middleware/JSONConverter';
-import secret from '../config/secret';
-import User from '../model/user';
-import Bluebird from 'bluebird';
+// import 'babel-polyfill';
+// import jwt from 'jwt-simple';
+// import Tactic from '../model/tactic'
+// import Pattern from '../model/pattern'
+// import express from 'express'
+// import mongoose from 'mongoose';
+// import Mapping from '../model/mapping';
+// import JSONConverter from '../middleware/JSONConverter';
+// import secret from '../config/secret';
+// import User from '../model/user';
+// import Bluebird from 'bluebird';
+
+const jwt = require('jwt-simple');
+const Tactic = require('../model/tactic');
+const Pattern = require('../model/pattern');
+const express = require('express');
+const mongoose = require('mongoose');
+const Mapping = require('../model/mapping');
+const JSONConverter = require('../middleware/JSONConverter');
+const secret = require('../config/secret');
+const User = require('../model/user');
+const Bluebird = require('bluebird');
 
 let router = express.Router();
 
@@ -284,7 +295,4 @@ function getRelatedPattern(queryParams,res){
 	})
 }
 
-
-
-
-export default router;
+module.exports = router;

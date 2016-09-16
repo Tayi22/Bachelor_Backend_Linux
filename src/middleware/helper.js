@@ -1,14 +1,22 @@
 //Helper Functions for simple Tasks that are requiered at multiple Targets
-import Mapping from '../model/mapping';
-import Tactic from '../model/tactic';
-import Pattern from '../model/pattern';
-import express from 'express'
-import mongoose from 'mongoose'
-import 'babel-polyfill';
-import Bluebird from 'bluebird';
-import JSONConverter from '../middleware/JSONConverter';
+// import 'babel-polyfill';
+// import Mapping from '../model/mapping';
+// import Tactic from '../model/tactic';
+// import Pattern from '../model/pattern';
+// import express from 'express'
+// import mongoose from 'mongoose'
+// import Bluebird from 'bluebird';
+// import JSONConverter from '../middleware/JSONConverter';
 
-export default{
+const Mapping = require('../model/mapping');
+const Tactic = require('../model/tactic');
+const Pattern = require('../model/pattern');
+const express = require('express');
+const mongoose = require('mongoose');
+const Bluebird = require('bluebird');
+const JSONConverter = require('../middleware/JSONConverter');
+
+const helper = {
 	//Allows to check for an existing Pattern. If Pattern is not found the process is canceled and an errormessage is send.
 	checkExistingPattern(req,res,next){
 		let patternId = req.body.pattern_id;
@@ -53,4 +61,6 @@ export default{
 		});
 	}
 
-}
+};
+
+module.exports = helper;
