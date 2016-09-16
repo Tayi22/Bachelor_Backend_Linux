@@ -4,8 +4,23 @@
 import mongoose from 'mongoose';
 
 const mappingSchema = new mongoose.Schema({
-    patternId: String,
-    tacticId: String
+    patternId: {type: String, required: true},
+    tacticId: {type: String, required: true},
+	info: String,
+	commentIds : Array,
+	ratingNumb : Number,
+	rating : Number
 });
+
+mappingSchema.methods.addRating = (rating)=>{
+	this.ratingNumb += 1;
+	this.rating += rating;
+}
+
+mappingSchema.methods.getRating = () =>{
+	return this.rating / this.ratingNumb;
+}
+
+
 
 export default mongoose.model('Mapping', mappingSchema);

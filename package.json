@@ -1,16 +1,20 @@
 {
   "name": "MainSite",
   "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node ./out/bin/server"
-  },
+  "description": "Just a small test to show how to debug ES6 in Webstorm.",
+  "main": "dist/index.js",
   "dependencies": {
+    "acl": "^0.4.9",
+    "async": "^2.0.0",
+    "babel-polyfill": "^6.9.1",
+    "bcrypt-nodejs": "^0.0.3",
+    "bluebird": "^3.4.1",
     "body-parser": "~1.15.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "express": "~4.13.4",
     "jade": "~1.11.0",
+    "jwt-simple": "^0.5.0",
     "kerberos": "~0.0.17",
     "method-override": "^2.3.6",
     "mongodb": "~2.0.33",
@@ -20,8 +24,20 @@
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {
+    "babel-core": "^6.2.1",
+    "chai": "^3.4.1",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-cli": "^1.0.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "mocha": "^2.3.4",
     "babel-cli": "^6.0.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0"
-  }
+  },
+  "scripts": {
+    "test": "mocha test --compilers js:babel-core/register",
+    "start": "node ./out/bin/server"
+  },
+  "private": true
 }

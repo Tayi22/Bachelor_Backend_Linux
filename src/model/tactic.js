@@ -4,9 +4,10 @@
 import mongoose from 'mongoose';
 
 const tacticsSchema = new mongoose.Schema({
-    name: String,
+    name: {type: String, index:{unique: true}},
     info: String,
     mappingIds: Array,
+	parentTacticId: String,
     childTacticIds: Array
 });
 
