@@ -61,6 +61,55 @@ router.post("/makeAdmin",(req,res)=>{
 })
 */
 
+router.get("/dataTestFiles",(req,res)=>{
+	var resistAttacks = new Tactic();
+	var limitExposure = new Tactic();
+	var hiddenImplementation = new Pattern();
+	var mapping1 = new Mapping();
+
+	resistAttacks.name = 'Resist Attacks';
+	resistAttacks.info = 'Test Data for Resist Attacks, not for final use';
+	resistAttacks.childTacticIds.push(limitExposure.id);
+
+	limitExposure.name = 'Limit Exposure';
+	limitExposure.info = 'Test Data, not for final use';
+	limitExposure.parentTacticId = resistAttacks.id;
+	limitExposure.mappingIds.push(mapping1.id);
+
+	hiddenImplementation.name = 'Hidden Implementation';
+	hiddenImplementation.info = 'Test Data Hidden Implementation, not for final use';
+	hiddenImplementation.mappingIds.push(mapping1.id);
+
+	mapping1.info = 'Test Mapping Data, not for final use';
+	mapping1.patternId = hiddenImplementation.id;
+	mapping1.tacticId = limitExposure.id;
+
+	resistAttacks.save((err, result)=>{
+		if (err) console.log(err)
+		else console.log(result)
+	})
+
+	limitExposure.save((err, result)=>{
+		if (err) console.log(err)
+		else console.log(result)
+	})
+
+	hiddenImplementation.save((err, result)=>{
+		if (err) console.log(err)
+		else console.log(result)
+	})
+
+	mapping1.save((err, result)=>{
+		if (err) console.log(err)
+		else console.log(result)
+	})
+
+	res.send("ok");
+
+
+
+
+})
 
 router.post("/login",(req,res)=> {
 	//Retrive username and password from body or set it empty.
