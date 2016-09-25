@@ -48,18 +48,23 @@ function expiresIn(numDays){
 	return dateObj.setDate(dateObj.getDate() + numDays);
 }
 //Uncomment if you need a new admin for testing.
-/*
+
 router.post("/makeAdmin",(req,res)=>{
 	var newUser = new User();
 	newUser.username = "admin";
 	newUser.password = "admin";
 	newUser.role = "admin";
+	newUser.token = new Object();
+	newUser.token.token = 'DEFAULT';
+	newUser.token.expires = 'DEFAULT';
+	newUser.ownedMappings = new Array();
+	newUser.ownedPatterns = new Array();
 	newUser.save((err, result)=>{
 		if (err) res.json(err);
 		res.json(result);
 	})
 })
-*/
+
 
 router.get("/dataTestFiles",(req,res)=>{
 	var resistAttacks = new Tactic();
@@ -134,13 +139,17 @@ router.post("/login",(req,res)=> {
 		//If no user is found, retun an errormessage.
 		if (!user){
 			res.json(JSONConverter.convertJSONError("Username or Password wrong"));
+			return;
 		}
 		//Validate the password if its the right password, send exactly the same Errormessage as above if Password doesnt check.
 		user.validatePassword(password,(err, isMatch)=>{
 			if(err) res.json(JSONConverter.convertJSONError(err));
 			else if(isMatch){
 				//Build the User that should be return only with neccasary Props.
+				let token = genToken();
+				user.token = token;
 				let returnUser = {
+					id: user.id,
 					username: user.username,
 					token : {
 						token: user.token.token,
@@ -149,8 +158,6 @@ router.post("/login",(req,res)=> {
 					comments : user.comments,
 					ratedMappings: user.ratedMappings
 				};
-				let token = genToken();
-				user.token = token;
 				user.save();
 				res.json(JSONConverter.convertJSONObject("user", returnUser));
 			}else
@@ -167,9 +174,6 @@ router.post("/login",(req,res)=> {
 
 //GET Method to retrieve all patterns that are saved to the db.
 router.get("/patterns",(req,res)=>{
-
-	console.log(req.headers['x-access-token']);
-	console.log(req.headers);
 
 	const queryParams = req.query;
 	if (Object.keys(queryParams).length === 0) {
@@ -222,7 +226,7 @@ router.get("/tactics/:tactic_id",(req,res)=>{
 		if (err)
 			res.json(JSONConverter.convertJSONError(err));
 		else
-			res.json("tactic", JSONConverter.convertJSONObject("tactic",queryResult));
+			res.json(JSONConverter.convertJSONObject("tactic",queryResult));
 	});
 });
 
@@ -261,12 +265,14 @@ router.get("/mappings", (req, res) => {
 
 });
 
+
 router.get("/mappings/:mapping_id",(req,res)=>{
-	Mapping.findById(req.params.tactic_id, (err, queryResult) => {
+	Mapping.findById(req.params.mapping_id, (err, queryResult) => {
 		if (err)
 			res.json(JSONConverter.convertJSONError(err));
 		else
-			res.json("tactic", JSONConverter.convertJSONObject("tactic",queryResult));
+			if(queryResult == null) queryResult='{}';
+			res.json(JSONConverter.convertJSONObject("mapping",queryResult));
 	});
 });
 
@@ -274,27 +280,42 @@ router.get("/mappings/:mapping_id",(req,res)=>{
 // ========== Users =========== //
 //Get and Post für Users here
 
-router.post("/users",(req,res)=>{
-		//TODO Change to the right req Params
-		let username = "hardCodeUsername";
-		let password = "hardCodePassword";
+router.post("/users",(req,res) => {
+	//TODO Change to the right req Params
+	let username = req.body.username || req.params.username || req.query['username'] || null;
+	let password = req.body.password || req.params.password || req.query['password'] || null;
+	let miniSecret = req.body.info || req.params.info || null;
 
-		let user = new User();
-		user.username = username;
-		user.password = password;
-		user.role = "user";
+	if(!username || !password || miniSecret !== "likeAcharm")
+	{
+		return res.json(JSONConverter.convertJSONError("No Params set or ParamNames wrong",400));
+	}
 
-		user.save((err,result)=>{
-			if (err){
-				res.json(JSONConverter.convertJSONError(err))
-			}
-			res.json({
-				"status" : 200,
-				"message" : "user created"
+	User.findOne({ 'username' : username }, (err,user)=> {
+		if(!user) {
+			let user = new User();
+			user.username = username;
+			user.password = password;
+			user.role = "user";
+			user.token = new Object();
+			user.token.token = 'DEFAULT';
+			user.token.expires = 'DEFAULT';
+			user.ownedMappings = new Array();
+			user.ownedPatterns = new Array();
+
+			user.save((err,result)=>{
+				if (err){
+					res.json(JSONConverter.convertJSONError(err))
+				}
+
+				res.json({
+					"status" : 200,
+					"message" : "user created"
+				})
 			})
-		})
-
+		}else res.json(JSONConverter.convertJSONError('User vorhanden'))
 	});
+});
 
 //query functions
 

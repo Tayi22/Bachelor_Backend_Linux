@@ -9,20 +9,22 @@ const secret = require('../config/secret');
 const User = require('../model/user');
 const Bluebird = require('bluebird');
 const mongoose = require('mongoose');
+const JSONConverter = require('../middleware/JSONConverter');
 
 function validateUser(username,token){
 
 	return new Bluebird((resolve)=>{
 		let promise = User.findOne({'username' : username}).exec();
-		promise.then((user)=>{
+		promise.then((user) => {
 			if(user.token.token === token) resolve(user);
 			else resolve(null);
 		})
 	})
 }
 
-
 module.exports = function(req,res,next){
+
+	if(req.method == 'OPTIONS') return next();
 	//Check weather the token is in body, query or in the header and set the variable "token".
 	let token = (req.body && req.body.access_token) || (req.query && req.query.access_token) || (req.headers['x-access-token']);
 
@@ -35,11 +37,9 @@ module.exports = function(req,res,next){
 			let decoded = jwt.decode(token, secret());
 			if (decoded.exp <= Date.now()) {
 				//If token is expired.
-				res.status(400);
-				res.json({
-					"status": 400,
-					"message": "Token Expired"
-				});
+				res.json(
+					JSONConverter.convertJSONError("Token expired",400)
+				);
 				return;
 			}
 
@@ -54,37 +54,22 @@ module.exports = function(req,res,next){
 						next()
 					} else {
 						//User is not an admin
-						res.status(403);
-						res.json({
-							"status": 403,
-							"message": "Not authorized!"
-						});
+						res.json(
+							JSONConverter.convertJSONError("unauthorized" + err,403)
+						);
 						return;
 					}
 				} else {
 					//No user with this name exists
-					res.status(401);
-					res.json({
-						"status": 401,
-						"message": "Invalid User"
-					});
+					res.json(JSONConverter.convertJSONError("Invalid user",400));
 					return;
 				}
 			});
 			}catch (err){
-				res.status(500);
-				res.json({
-					"status": 500,
-					"message": "Something went wrong",
-					"error": err
-				});
+				res.json(JSONConverter.convertJSONError("Invalid user",400));
 			}
 	}else {
-		res.status(401);
-		res.json({
-			"status": 401,
-			"message": "Invalid Token or Key"
-		});
+		res.json(JSONConverter.convertJSONError("Invalid params",400));
 		return;
 	}
 };

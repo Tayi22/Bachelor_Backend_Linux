@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
 	password: {type: String, required: true},
 	ratedMappings: Array,
 	role: {type: String, required: true},
-	token: Object
+	token: Object,
+	ownedMappings: Array,
+	ownedPatterns: Array
 });
 
 userSchema.pre('save', function(next){

@@ -23,6 +23,7 @@ const anonym = require('./routes/anonymosRoutes');
 const registred = require('./routes/registeredRoutes');
 const mongoose = require('mongoose');
 const validator = require('./middleware/validateRequest');
+const originValidator = require('./middleware/validateOrigin');
 const admin = require('./routes/adminRoutes');
 const JSONConverter = require('./middleware/JSONConverter');
 
@@ -37,7 +38,7 @@ expressVar.set('view engine','jade');
 
 
 expressVar.all('/*', function(req,res,next){
-	res.header("Access-Control-Allow-Origin","*");
+	res.header("Access-Control-Allow-Origin","https://localhost:4200");
 	res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS');
 	res.header('Access-Control-Allow-Headers','Content-Type,Accept,X-Access-Token,X-Key,X-Requested-With');
 	next();
@@ -45,6 +46,10 @@ expressVar.all('/*', function(req,res,next){
 
 //TODO Uncomment to activate the validation
 //expressVar.all('/user/*',validator);
+
+//Checks if the origin is our Ember App and NOTHING ELSE
+//Uncomment to activate
+//expressVar.all('/*', originValidator);
 
 expressVar.use(logger('dev'));
 expressVar.use(bodyParser.json());

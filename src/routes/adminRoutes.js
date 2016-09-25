@@ -69,7 +69,7 @@ router.delete('/patterns',(req,res)=>{
 		//Delete all Mappings related to this Pattern.
 		let mappingIdArray = doc.mappingIds;
 		let mappingIdArrayPromise = mappingIdArray.map((item)=>{
-			return deleteMapping(item.toString());
+			return helper.deleteMapping(item.toString());
 		});
 		Bluebird.all(mappingIdArrayPromise).catch((reject)=>{
 			errorString += "Error: " + reject + " ";
@@ -170,30 +170,5 @@ router.get('/users/:user_id',(req,res)=>{
 
 //========== Private Functions ==========//
 //This functions are used by the REST Methods to work on the data.
-
-function deleteMapping(id){
-	return new Bluebird(function(resolve,reject) {
-		mongoose.Promise = Bluebird;
-		let mappingId = id;
-		//Cast the String to an ObjectId so the ID is found in the mappingIds field.
-		let mappingIdForPull = mongoose.Types.ObjectId(mappingId);
-		let mappingPromise = Mapping.findById({_id : mappingId}).exec();
-		mappingPromise.then((doc)=> {
-			var promise = [];
-			promise.push(Tactic.findByIdAndUpdate(doc.tacticId, {$pull: {mappingIds: mappingIdForPull}}).exec());
-			promise.push(Pattern.findByIdAndUpdate(doc.patternId, {$pull: {mappingIds: mappingIdForPull}}).exec());
-			Bluebird.all(promise).then(function () {
-				let deleteQuery = Mapping.findById({_id : mappingId}).remove((err)=> {
-					if (err) reject(err);
-					else resolve(200);
-				})
-			}).catch(e=> {
-				reject(e);
-			});
-		}).catch(e=> {
-			return reject(e);
-		});
-	});
-}
 
 module.exports = router;

@@ -15,8 +15,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Bluebird = require('bluebird');
 const JSONConverter = require('../middleware/JSONConverter');
+const User = require('../model/user');
 
 const helper = {
+
+	filterInput(rawString){
+		if(/[^a-zA-Z0-9]/.test(rawString))
+		{
+			return false
+		}
+		return true;
+	},
+
+
 	//Allows to check for an existing Pattern. If Pattern is not found the process is canceled and an errormessage is send.
 	checkExistingPattern(req,res,next){
 		let patternId = req.body.pattern_id;
@@ -59,8 +70,40 @@ const helper = {
 				next();
 			}
 		});
-	}
+	},
 
+	deleteMapping(id){
+	return new Bluebird(function(resolve,reject) {
+		console.log("entered");
+		mongoose.Promise = Bluebird;
+		let mappingId = id;
+		//Cast the String to an ObjectId so the ID is found in the mappingIds field.
+		let mappingIdForPull = mongoose.Types.ObjectId(mappingId);
+		let mappingPromise = Mapping.findById(mappingId).exec();
+		mappingPromise.then((doc)=> {
+			console.log("doc: " + doc);
+			var promise = [];
+			promise.push(Tactic.findByIdAndUpdate(doc.tacticId, { $pull: { mappingIds: mappingIdForPull } }).exec());
+			promise.push(User.findByIdAndUpdate(doc.owner, { $pull: {ownedMappings: mappingIdForPull } }).exec());
+			promise.push(Pattern.findByIdAndUpdate(doc.patternId, { $pull: { mappingIds: mappingIdForPull } }).exec());
+			Bluebird.all(promise).then(function () {
+				let deleteQuery = Mapping.findById(mappingId).remove((err)=> {
+					if (err){
+						console.log(e + "error 3 here");
+						reject(err);
+					} 
+					else resolve(200);
+				})
+			}).catch(e=> {
+				console.log(e + "error here");
+				reject(e);
+			});
+		}).catch(e=> {
+			console.log(e + "error 2 here");
+			return reject(e);
+		});
+	});
+}
 };
 
 module.exports = helper;

@@ -6,8 +6,9 @@
 const mongoose = require('mongoose');
 
 const mappingSchema = new mongoose.Schema({
-    patternId: {type: String, required: true},
-    tacticId: {type: String, required: true},
+  patternId: {type: String, required: true},
+  tacticId: {type: String, required: true},
+  owner: { type: String, required: true },
 	info: String,
 	commentIds : Array,
 	ratingNumb : Number,
