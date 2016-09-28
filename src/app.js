@@ -45,7 +45,7 @@ expressVar.all('/*', function(req,res,next){
 });
 
 //TODO Uncomment to activate the validation
-//expressVar.all('/user/*',validator);
+expressVar.all('/user/*',validator);
 
 //Checks if the origin is our Ember App and NOTHING ELSE
 //Uncomment to activate

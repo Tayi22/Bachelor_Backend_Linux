@@ -11,7 +11,7 @@ const Bluebird = require('bluebird');
 const mongoose = require('mongoose');
 const JSONConverter = require('../middleware/JSONConverter');
 
-function validateUser(username,token){
+function validateUser(username,token,id){
 
 	return new Bluebird((resolve)=>{
 		let promise = User.findOne({'username' : username}).exec();

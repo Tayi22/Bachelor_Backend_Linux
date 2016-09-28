@@ -31,13 +31,13 @@ httpsServer.listen(8443, '10.0.0.8');
 console.log('https server running on port 8443');
 
 
-var port = process.env.PORT || '3000';
-app.set('port', port);
+//var port = process.env.PORT || '3000';
+//app.set('port', port);
 
-app.listen(port, '10.0.0.8');
+//app.listen(port, '10.0.0.4');
 
 
-console.log("server running on " + port);
+//console.log("server running on " + port);
 
 // export default app;
 module.exports = app;

@@ -24,70 +24,6 @@ let router = express.Router();
 
 //========== Patterns ==========//
 
-router.post('/patterns',(req,res)=> {
-	//TODO Copy from index.js and adjust for ember.js
-	let savePattern = new Pattern();
-
-	//Look through all three methods how you can pass params in express.
-	let name = req.body.name || req.params.name || req.query['name'] || null;
-	let info = req.body.info || req.params.info || req.query['info'] || null;
-
-	if (!name || !info)return res.json(JSONConverter.convertJSONError("No Params set or ParamNames wrong",400));
-
-	savePattern.name = name;
-	savePattern.info = info;
-
-	if (req.body.relatedPatternIds === undefined)
-		req.body.relatedPatternIds = [];
-
-	savePattern.relatedPatternIds = [];
-
-	// execute the tasks synchronously:
-	async.series([
-		// add relatedPatternIds to the savedPattern if they exist and also add the savePattern to the relatedPatterns
-		function (callback) {
-			let index = 0;
-			async.whilst(
-				function testCondition() {
-					return index < req.body.relatedPatternIds.length;
-				},
-				function iteration(callback) {
-					//execute queries synchronously
-					Pattern.findByIdAndUpdate(req.body.relatedPatternIds[index], {$push: {relatedPatternIds: savePattern._id}}, (err, updateObject) => {
-						// if the relatedPatternId from the request is found in the db,
-						// it is added to savePattern
-						if (!err && updateObject !== null) {
-
-							//format relatedPatternId from post request as Object id
-							const relatedPatternObjectId = mongoose.Types.ObjectId(req.body.relatedPatternIds[index]);
-
-							// save the relatedPatternId to savePattern
-							savePattern.relatedPatternIds.push(relatedPatternObjectId);
-						}
-						//increment and call the next iteration of the loop via callback
-						index++;
-						callback();
-					});
-				},
-				// callback function from async.whilst is called when the testCondition fails
-				function () {
-					// callback from async.series is called to start the next function of async.series
-					callback();
-				}
-			);
-		},
-		// save savePattern to database
-		function (callback) {
-			savePattern.save((err, savedObject) => {
-				if (err)
-					res.json(JSONConverter.convertJSONError(err));
-				else
-					res.json(savedObject);
-				callback();
-			});
-		}
-	]);
-});
 
 
 //========== Tactics ==========//
@@ -102,7 +38,8 @@ router.get('/users/:userId', (req, res) => {
 	if(!userId) return res.json(JSONConverter.convertJSONError('No Param',400));
 
 	User.findById(userId, (err, userDoc) => {
-		if(err) return res.json(JSONConverter.convertJSONError('Not found',404));
+		if (!userId) return res.status(404).json(JSONConverter.convertJSONError('Not found',404));
+		if(err) return res.status(404).json(JSONConverter.convertJSONError('Not found',404));
 		let returnUser = {
 			_id: userDoc._id,
 			username: userDoc.username,
@@ -110,23 +47,21 @@ router.get('/users/:userId', (req, res) => {
 			ownedMappings: userDoc.ownedMappings,
 			ownedPatterns: userDoc.ownedPatters
 		}
-		console.log(returnUser);
 		res.json(JSONConverter.convertJSONObject('user', returnUser));
 	});
 });
 
 
 router.put('/users/:userId', (req, res) => {
-	console.log('userId' + req.params.userId);
 	User.findById(req.params.userId, (err, userDoc) => {
-		if (err) return res.json(JSONConverter.convertJSONError('Not found',404));
+		if (err) return res.status(404).json(JSONConverter.convertJSONError('Not found',404));
 		let newUser = req.body.user;
 		if (newUser.ratedMappings) userDoc.ratedMappings = newUser.ratedMappings;
 		if (newUser.ownedMappings) userDoc.ownedMappings = newUser.ownedMappings;
 		if (newUser.ownedPatterns) userDoc.ownedPatterns = newUser.ownedPatterns;
 
 		userDoc.save((err) => {
-			if (err) return res.json(JSONConverter.convertJSONError("Servererror" + err,500));
+			if (err) return res.status(500).json(JSONConverter.convertJSONError("Servererror" + err,500));
 			let returnUser = {
 			_id: userDoc._id,
 			username: userDoc.username,
@@ -143,20 +78,20 @@ router.put('/users/:userId', (req, res) => {
 //========== Mappings ==========//
 
 
-router.post('/mappings',helper.checkExistingPattern,helper.checkExistingTactic,(req,res)=>{
+router.post('/mappings',(req,res)=>{
+	const newMapping = req.body.mapping
 
 	//Import all required Params for the next steps or send an error back if some parameters are not set right.
-	let patternId = req.body.pattern_id || req.params.pattern_id || req.query['pattern_id'] || null;
-	let tacticId = req.body.tactic_id || req.params.tactic_id || req.query['tactic_id'] || null;
-	let info = req.body.info || req.params.info || req.query['info'] || null;
-	let userId = req.body.user_id || req.params.user_id || null;
+	const patternId = newMapping.patternId || req.params.patternId || req.query['patternId'] || null;
+	let tacticId = newMapping.tacticId || req.params.tacticId || req.query['tacticId'] || null;
+	let info = newMapping.info || req.params.info || req.query['info'] || null;
+	let userId = newMapping.owner || req.params.owner || null;
 
-	if (!patternId || !tacticId || !info || !userId) return res.json(JSONConverter.convertJSONError("Could not find pattern_id, tactic_id or info",400));
-
+	if (!patternId || !tacticId || !info || !userId) return res.status(422).json(JSONConverter.convertJSONError("Params malfunctioned",400));
 
 	Mapping.findOne({ 'patternId': patternId, 'tacticId': tacticId }, (err, result) => {
 
-		if(result) return res.json(JSONConverter.convertJSONError('Mapping vorhanden',400));
+		if(result) return res.status(400).json(JSONConverter.convertJSONError('Mapping vorhanden',400));
 
 		mongoose.Promise = Bluebird;
 		let saveMapping = new Mapping();
@@ -194,7 +129,7 @@ router.put('/mappings/:mappingId', (req, res) => {
 
 		const oldMapping = req.body.mapping;
 
-		if(!oldMapping.patternId || !oldMapping.tacticId)return res.json(JSONConverter.convertJSONError("Inconsistend",400));
+		if(!oldMapping.patternId || !oldMapping.tacticId)return res.status(400).json(JSONConverter.convertJSONError("Inconsistend",400));
 
 		if(oldMapping.info) mappingDoc.info = oldMapping.info;
 		if(oldMapping.owner) mappingDoc.owner = oldMapping.owner;
@@ -202,7 +137,7 @@ router.put('/mappings/:mappingId', (req, res) => {
 		if(oldMapping.ratingNumb) mappingDoc.ratingNumb = oldMapping.ratingNumb;
 
 		mappingDoc.save( (err) => {
-			if (err) return res.json(JSONConverter.convertJSONError("Servererror" + err,500));
+			if (err) return res.status(500).json(JSONConverter.convertJSONError("Servererror" + err,500));
 			res.json(JSONConverter.convertJSONObject('mapping',mappingDoc));
 		});
 	});
@@ -213,23 +148,16 @@ router.delete('/mappings/:mapping_id',(req,res) => {
 	promise
 		//If the resolve is set, then is triggered
 		.then((resolve)=>{
-			res.status(resolve).send();
+			res.status(200).send(JSONConverter.convertJSONObject("mapping", resolve));
 		})
 		// If the reject is set, catch is triggered
 		.catch((reject)=>{
-			console.log("rejected" + reject);
 			res.status(500).send(reject);
 		})
 })
 
 //========== Checker ==========//
-//Helper Functions to check local storage of ember client.
-
-router.get('/check',(req, res) => {
-	const bool = true;
-	console.log(JSONConverter.convertJSONObject('bool', bool));
-	res.json(JSONConverter.convertJSONObject('bool', bool));
-}); 
+//Helper Functions to check local storage of ember client. 
 
 
 module.exports = router;

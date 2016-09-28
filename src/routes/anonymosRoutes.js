@@ -52,7 +52,7 @@ function expiresIn(numDays){
 router.post("/makeAdmin",(req,res)=>{
 	var newUser = new User();
 	newUser.username = "admin";
-	newUser.password = "admin";
+	newUser.password = "thisIsAdminPW1337";
 	newUser.role = "admin";
 	newUser.token = new Object();
 	newUser.token.token = 'DEFAULT';
@@ -65,56 +65,6 @@ router.post("/makeAdmin",(req,res)=>{
 	})
 })
 
-
-router.get("/dataTestFiles",(req,res)=>{
-	var resistAttacks = new Tactic();
-	var limitExposure = new Tactic();
-	var hiddenImplementation = new Pattern();
-	var mapping1 = new Mapping();
-
-	resistAttacks.name = 'Resist Attacks';
-	resistAttacks.info = 'Test Data for Resist Attacks, not for final use';
-	resistAttacks.childTacticIds.push(limitExposure.id);
-
-	limitExposure.name = 'Limit Exposure';
-	limitExposure.info = 'Test Data, not for final use';
-	limitExposure.parentTacticId = resistAttacks.id;
-	limitExposure.mappingIds.push(mapping1.id);
-
-	hiddenImplementation.name = 'Hidden Implementation';
-	hiddenImplementation.info = 'Test Data Hidden Implementation, not for final use';
-	hiddenImplementation.mappingIds.push(mapping1.id);
-
-	mapping1.info = 'Test Mapping Data, not for final use';
-	mapping1.patternId = hiddenImplementation.id;
-	mapping1.tacticId = limitExposure.id;
-
-	resistAttacks.save((err, result)=>{
-		if (err) console.log(err)
-		else console.log(result)
-	})
-
-	limitExposure.save((err, result)=>{
-		if (err) console.log(err)
-		else console.log(result)
-	})
-
-	hiddenImplementation.save((err, result)=>{
-		if (err) console.log(err)
-		else console.log(result)
-	})
-
-	mapping1.save((err, result)=>{
-		if (err) console.log(err)
-		else console.log(result)
-	})
-
-	res.send("ok");
-
-
-
-
-})
 
 router.post("/login",(req,res)=> {
 	//Retrive username and password from body or set it empty.
@@ -173,14 +123,14 @@ router.post("/login",(req,res)=> {
 //If an id is needed, its always <name>_id in params/body.
 
 //GET Method to retrieve all patterns that are saved to the db.
-router.get("/patterns",(req,res)=>{
+router.get('/patterns', (req,res) => {
 
 	const queryParams = req.query;
 	if (Object.keys(queryParams).length === 0) {
 
-		Pattern.find((err, queryResult) => {
-			if (err)
-				res.json(JSONConverter.convertJSONError(err));
+  Pattern.find((err, queryResult) => {
+  	if (err)
+  		res.json(JSONConverter.convertJSONError(err));
 			else
 			//console.log({}.toString.call(queryResult).split(' ')[1].slice(0, -1).toLowerCase());
 				res.json(JSONConverter.convertJSONArray("pattern", queryResult));
@@ -212,17 +162,32 @@ router.get("/patterns/:pattern_id",(req,res)=>{
 //The Following Methods are alle GET Methods that returns an array of tactics or a single tactic
 //If an id is needed, its always <name>_id in params/body.
 
-router.get("/tactics",(req,res)=>{
+router.get('/tactics', (req, res) => {
+
+  if (req.query['filter']) {
+    Tactic.find((err, result) => {
+    	if (err) return json.status(404).json(JSONConverter.convertJSONError(err));
+      const filteredArray = result.filter((item) => {
+        if (!item.childTacticIds.length > 0) return true;
+        return false;
+      });
+      return res.status(200).json(JSONConverter.convertJSONArray('tactics', filteredArray));
+    });
+    return;
+	}
+
+	console.log("got here");
 	Tactic.find((err, queryResult) => {
 		if (err)
-			res.json(JSONConverter.convertJSONError(err));
+			return res.json(JSONConverter.convertJSONError(err));
 		else
-			res.json(JSONConverter.convertJSONArray("tactics",queryResult));
+			return res.json(JSONConverter.convertJSONArray("tactics",queryResult));
 	});
 });
 
 router.get("/tactics/:tactic_id",(req,res)=>{
-	Tactic.findById(req.params.tactic_id, (err, queryResult) => {
+  
+ 	Tactic.findById(req.params.tactic_id, (err, queryResult) => {
 		if (err)
 			res.json(JSONConverter.convertJSONError(err));
 		else
@@ -284,12 +249,14 @@ router.post("/users",(req,res) => {
 	//TODO Change to the right req Params
 	let username = req.body.username || req.params.username || req.query['username'] || null;
 	let password = req.body.password || req.params.password || req.query['password'] || null;
-	let miniSecret = req.body.info || req.params.info || null;
 
-	if(!username || !password || miniSecret !== "likeAcharm")
+	if(!username || !password)
 	{
 		return res.json(JSONConverter.convertJSONError("No Params set or ParamNames wrong",400));
 	}
+
+	if( /[^a-zA-Z0-9]/.test( username ) ) return res.json(JSONConverter.convertJSONError("Only alphanumeric",400))
+       
 
 	User.findOne({ 'username' : username }, (err,user)=> {
 		if(!user) {

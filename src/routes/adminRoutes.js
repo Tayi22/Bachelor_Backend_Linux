@@ -25,28 +25,91 @@ let router = express.Router();
 
 //========== Patterns ==========//
 
-router.delete('/test',(req,res)=>{
-	console.log("test");
-	res.json({"ok":"ok"});
+router.post('/patterns',(req,res)=> {
+	//TODO Copy from index.js and adjust for ember.js
+	let savePattern = new Pattern();
+
+	//Look through all three methods how you can pass params in express.
+	let name = req.body.pattern.name || req.params.name || req.query['name'] || null;
+	let info = req.body.pattern.info || req.params.info || req.query['info'] || null;
+
+	if (!name || !info)return res.json(JSONConverter.convertJSONError("No Params set or ParamNames wrong",400));
+
+	savePattern.name = name;
+	savePattern.info = info;
+
+	if (req.body.relatedPatternIds === undefined)
+		req.body.relatedPatternIds = [];
+
+	savePattern.relatedPatternIds = [];
+
+	// execute the tasks synchronously:
+	async.series([
+		// add relatedPatternIds to the savedPattern if they exist and also add the savePattern to the relatedPatterns
+		function (callback) {
+			let index = 0;
+			async.whilst(
+				function testCondition() {
+					return index < req.body.relatedPatternIds.length;
+				},
+				function iteration(callback) {
+					//execute queries synchronously
+					Pattern.findByIdAndUpdate(req.body.relatedPatternIds[index], {$push: {relatedPatternIds: savePattern._id}}, (err, updateObject) => {
+						// if the relatedPatternId from the request is found in the db,
+						// it is added to savePattern
+						if (!err && updateObject !== null) {
+
+							//format relatedPatternId from post request as Object id
+							const relatedPatternObjectId = mongoose.Types.ObjectId(req.body.relatedPatternIds[index]);
+
+							// save the relatedPatternId to savePattern
+							savePattern.relatedPatternIds.push(relatedPatternObjectId);
+						}
+						//increment and call the next iteration of the loop via callback
+						index++;
+						callback();
+					});
+				},
+				// callback function from async.whilst is called when the testCondition fails
+				function () {
+					// callback from async.series is called to start the next function of async.series
+					callback();
+				}
+			);
+		},
+		// save savePattern to database
+		function (callback) {
+			savePattern.save((err, savedObject) => {
+				if (err)
+					res.json(JSONConverter.convertJSONError(err));
+				else
+					res.json(JSONConverter.convertJSONObject('pattern', savedObject));
+				callback();
+			});
+		}
+	]);
 });
 
-router.delete('/patterns',(req,res)=>{
+
+router.delete('/patterns/:pattern_id',(req,res)=>{
 
 	mongoose.Promise = Bluebird;
 
 	//if somewhere an error occurs, this String is filled with the data.
 	let errorString = "";
+	let returnDoc;
 
 	//This is the ID of the Pattern that needs to be deleted in die related Patterns
 	let patternId = req.body.pattern_id || req.params.pattern_id || req.query['pattern_id'] || null;
 
-	if (!patternId) res.json(JSONConverter.convertJSONError("Wrong Params, pattern_id not found",400));
+	if (!patternId) res.status(400).json(JSONConverter.convertJSONError("Wrong Params, pattern_id not found",400));
 
 	//Without this Mongo would find the right Pattern, it Changes the String to an ObjectID.
 	var patternObjectId = mongoose.Types.ObjectId(patternId);
 	let promise = Pattern.findById({_id : patternId}).exec();
 	promise.then(function(doc){
-		if (doc.length === 0) return res.json(JSONConverter.convertJSONError("No pattern found", 404));
+		if (doc.length === 0) return res.status(404).json(JSONConverter.convertJSONError("No pattern found", 404));
+		returnDoc = doc;
 		let relatedPatternArray = doc.relatedPatternIds;
 		let promiseRelatedPatternArray = relatedPatternArray.map((item) =>{
 			return new Bluebird((resolve,reject)=>{
@@ -76,12 +139,10 @@ router.delete('/patterns',(req,res)=>{
 		})
 		//Delete the Pattern itself.
 	}).then(()=>{
-		/*Pattern.findById(patternObjectId.toString()).remove((err)=>{
+		Pattern.findById(patternObjectId.toString()).remove((err)=>{
 			if(err) errorString += "Error: " + err.message + " ";
-
-			if (errorString.length <= 0) res.json(JSONConverter.convertJSONError(errorString))
-			else*/ res.json(JSONConverter.convertJSONObject("done",{name : "delete", message : "All Ok"}));
-		/*});*/
+			res.json(JSONConverter.convertJSONObject("pattern", returnDoc));
+		});
 	});
 });
 
@@ -97,8 +158,8 @@ router.delete('/tactics/:tactic_id',helper.checkExistingTactic,(req,res)=>{
 
 	let mainPromise = Tactic.findById(tacticId).exec();
 	mainPromise.then((doc)=> {
-		let parentTacticId = doc.parentTacticId;
-		let childTacticIds = doc.childTacticIds;
+		if (doc.childTacticIds.isEmpty()) return res.status(400).json(JSONConverter.convertJSONError("Remove childtactics first",404));
+		
 
 
 	});
