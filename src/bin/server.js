@@ -27,7 +27,7 @@ app.disable('x-powered-by');
 //app.server = http.createServer(app);
 
 const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(8443, '10.0.0.8');
+httpsServer.listen(8443);
 console.log('https server running on port 8443');
 
 

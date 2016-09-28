@@ -119,13 +119,14 @@ router.post("/login",(req,res)=> {
 });
 
 //========== Patterns ==========//
-//The Following Methods are alle GET Methods that returns an array of patterns or a single pattern
+//The Following Methods are all GET Methods that returns an array of patterns or a single pattern
 //If an id is needed, its always <name>_id in params/body.
 
 //GET Method to retrieve all patterns that are saved to the db.
 router.get('/patterns', (req,res) => {
 
 	const queryParams = req.query;
+	
 	if (Object.keys(queryParams).length === 0) {
 
   Pattern.find((err, queryResult) => {
@@ -140,6 +141,14 @@ router.get('/patterns', (req,res) => {
 	else if ("patternId" in queryParams){
 		//Get all related Patterns and send it back to the caller.
 		getRelatedPattern(queryParams,res);
+	}
+
+	else if ('mappingIds' in queryParams) {
+		// get patterns with specific mappingIds
+		_getPatternsByMappingIds(queryParams, (err, doc) => {
+			if (err) res.status(400).json(JSONConverter.convertJSONError(err.message));
+			res.status(200).json(JSONConverter.convertJSONArray('patterns', doc));
+		});
 	}
 
 	else{
@@ -219,7 +228,7 @@ router.get("/mappings", (req, res) => {
 	}
 
 	//Query: getMappingsByTacticId
-	else if('tacticId' in queryParams){
+	else if('tacticId' in queryParams) {
 		getMappingsByTacticId(queryParams,res);
 	}
 
@@ -330,6 +339,23 @@ function getRelatedPattern(queryParams,res){
 			})
 		}
 	})
+}
+
+function _getPatternsByMappingIds(queryParams, callback) {
+
+	// return all patterns without a mapping
+	if (queryParams.mappingIds === 'notEmpty') {
+		Pattern.find({ mappingIds: { $not: {$size: 0} } } , (err, doc) => {
+
+			if (err) return callback(err);
+			return callback(null, doc);
+		});
+	} else {
+		const error = new Error();
+		error.status = 400;
+		error.message = 'query not supported'
+		caĺlback(error, null);
+	}
 }
 
 module.exports = router;
