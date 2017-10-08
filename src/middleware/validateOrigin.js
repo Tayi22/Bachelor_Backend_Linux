@@ -1,4 +1,5 @@
 const url = require('url');
+const serverconf = require("../config/serverconfig")
 
 //Checks if the Origin comes from our Ember Applikation
 module.exports = function(req, res, next) {
@@ -59,7 +60,7 @@ module.exports = function(req, res, next) {
   const ref = req.headers.referer;
   if (ref) {
     const urlParse = url.parse(ref);
-    if(urlParse && urlParse.host === 'localhost:4200') return next();
+    if(urlParse && urlParse.host === serverconf.address + ':4200') return next();
     else res.send(403, dickbutt);
   } else {
     res.send(403, dickbutt);
