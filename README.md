@@ -17,7 +17,7 @@ The following programs needs to be installed before you can run the application:
 ### Start Database
 
 To start the mongo database, navigate to the cloned folder and use:
-`mongod -dbpath data/db`
+`mongod -dbpath data/db` (If data/db doesnt exist, create the folders)
 
 The database should now be waiting for connections. 
 If the database throw an error, enter `killall mongod` in the terminal and retry
