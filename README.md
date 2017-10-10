@@ -42,9 +42,11 @@ To check if the data was correctly imported, follow these steps
 ### Start the Backend Server
 
 1. Make sure the mongo database is running
-2. Make sure Node.js is installed 
-3. Open a seperate terminal and navigate to /src/bin
-4. Start the server with `node server.js`
+2. Make sure Node.js is installed
+3. Open a seperate terminal and navigate to /src/config
+4. Open serverconfig.js and type in your ip address of the server
+5. Navigate to /src/bin
+6. Start the server with `node server.js`
 
 To test if the server is running, navigate to https://yourserverip:8443/patterns
 Accept the SSL certificate and you should be able to see all patterns which where imported to the database.
