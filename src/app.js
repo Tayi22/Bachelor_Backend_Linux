@@ -39,7 +39,7 @@ expressVar.set('view engine','jade');
 
 
 expressVar.all('/*', function(req,res,next){
-	res.header("Access-Control-Allow-Origin","https://" + serverconfig.adress + ":4200");
+	res.header("Access-Control-Allow-Origin","https://" + serverconfig.address + ":4200");
 	res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS');
 	res.header('Access-Control-Allow-Headers','Content-Type,Accept,X-Access-Token,X-Key,X-Requested-With');
 	next();
